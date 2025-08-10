@@ -29,31 +29,34 @@ class Upbot(Enemy):
         self.ls = 0
         self.r = 2000
         self.direction = 'Up'
-        self.b = []
+        # Завантаження та масштабування картинок для вертикального руху
+        self.images = {
+            'Up': pygame.transform.scale(pygame.image.load('manUp.png'), (15, 15)),
+            'Down': pygame.transform.scale(pygame.image.load('manDown.png'), (15, 15))
+        }
+
     def move(self, obstacle):
-            if self.direction == 'Up':
-                dy = -5
-            else:
-                dy = 5
-            newy = self.rect.y + dy
+        if self.direction == 'Up':
+            dy = -5
+        else:
+            dy = 5
+        newy = self.rect.y + dy
 
-            a = pygame.Rect(self.rect.x, newy, 15, 15)    
-            for o in obstacle:
-
-                if a.colliderect(o.rect):
-                    if self.direction == 'Up':
-                        self.direction = 'Down' 
-                    else:
-                        self.direction = 'Up'
-
-                    return
-            if newy < 0 or newy > 400:
+        a = pygame.Rect(self.rect.x, newy, 15, 15)    
+        for o in obstacle:
+            if a.colliderect(o.rect):
                 if self.direction == 'Up':
                     self.direction = 'Down' 
                 else:
                     self.direction = 'Up'
+                return
+        if newy < 0 or newy > 400:
+            if self.direction == 'Up':
+                self.direction = 'Down' 
+            else:
+                self.direction = 'Up'
 
-            self.rect.y = newy
+        self.rect.y = newy
 
     def shoot(self):
         nowtime = pygame.time.get_ticks()
@@ -68,50 +71,51 @@ class Upbot(Enemy):
             b = Bullet(self.rect.centerx, self.rect.centery, dx, dy)
             if hasattr(self, 'bullet_img'):
                 b.image = self.bullet_img
-            self.b.append(b)
+            self.bullets.append(b)
             self.ls = nowtime
             
     def draw(self, p): 
-        if hasattr(self, 'image'):
-            p.blit(self.image, self.rect)
-        else:
-            pygame.draw.rect(p, (255, 0, 0), self.rect)
+        # Відображаємо відповідну картинку залежно від напрямку
+        p.blit(self.images[self.direction], self.rect)
 
-        for b in self.b:
+        for b in self.bullets:
             b.move()
             b.draw(p)
+
 class Squarebot(Enemy):
     def __init__(self, x, y):
         super().__init__(x, y)
-
         self.direction = 'left'
         self.ls = 0
         self.r = 2000
-        self.b = []
+        # Завантаження та масштабування картинок для горизонтального руху
+        self.images = {
+            'left': pygame.transform.scale(pygame.image.load('manLeft.png'), (15, 15)),
+            'right': pygame.transform.scale(pygame.image.load('manRight.png'), (15, 15))
+        }
 
-    def move(self, obstacle ):
-            if self.direction == 'left':
-                dx = -5
-            else:
-                dx = 5
-            newx = self.rect.x + dx
+    def move(self, obstacle):
+        if self.direction == 'left':
+            dx = -5
+        else:
+            dx = 5
+        newx = self.rect.x + dx
 
-            a = pygame.Rect(newx, self.rect.y, 15, 15)    
-            for o in obstacle:
-
-                if a.colliderect(o.rect):
-                    if self.direction == 'left':
-                        self.direction = 'right' 
-                    else:
-                        self.direction = 'left'
-                    return
-            if newx < 0 or newx > 350:
+        a = pygame.Rect(newx, self.rect.y, 15, 15)    
+        for o in obstacle:
+            if a.colliderect(o.rect):
                 if self.direction == 'left':
                     self.direction = 'right' 
                 else:
                     self.direction = 'left'
+                return
+        if newx < 0 or newx > 350:
+            if self.direction == 'left':
+                self.direction = 'right' 
+            else:
+                self.direction = 'left'
                     
-            self.rect.x = newx
+        self.rect.x = newx
 
     def shoot(self):
         nowtime = pygame.time.get_ticks()
@@ -126,15 +130,13 @@ class Squarebot(Enemy):
             b = Bullet(self.rect.centerx, self.rect.centery, dx, dy)
             if hasattr(self, 'bullet_img'):
                 b.image = self.bullet_img
-            self.b.append(b)
+            self.bullets.append(b)
             self.ls = nowtime
 
     def draw(self, p): 
-        if hasattr(self, 'image'):
-            p.blit(self.image, self.rect)
-        else:
-            pygame.draw.rect(p, (255, 0, 0), self.rect)
-        for b in self.b:
+        # Відображаємо відповідну картинку залежно від напрямку
+        p.blit(self.images[self.direction], self.rect)
+        for b in self.bullets:
             b.move()
             b.draw(p)
 
